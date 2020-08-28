@@ -1,4 +1,5 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, dialog } = require('electron');
+const fs = require('fs');
 
 let mainWindow = null;
 
@@ -17,10 +18,31 @@ app.on('ready', () => {
   // avoid showing a blank page when the application launch.
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
+    getFileFromUser();
   });
 
   mainWindow.on('close', () => {
     mainWindow = null;
   });
 });
+
+// Function that retrieve a text file on user's disk.
+const getFileFromUser = () => {
+  const files = dialog.showOpenDialogSync(mainWindow, {
+    properties: ['openFile'],
+    filters: [
+      {name: 'Text Files', extension: ['txt']},
+      {name: 'Markdown Files', extension: ['md', 'markdown']}
+    ]
+  });
+
+  if (!files) {
+    return;
+  }
+
+  const file = files[0];
+  const file_content = fs.readFileSync(file).toString();
+
+  console.log(file_content);
+};
