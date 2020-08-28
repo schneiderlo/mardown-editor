@@ -5,7 +5,10 @@ let mainWindow = null;
 app.on('ready', () => {
 
   mainWindow = new BrowserWindow({
-    show: false
+    show: false,
+    webPreferences: {
+      nodeIntegration: true
+    }
   });
 
   mainWindow.loadFile('./app/index.html');
@@ -14,6 +17,7 @@ app.on('ready', () => {
   // avoid showing a blank page when the application launch.
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
+    mainWindow.webContents.openDevTools();
   });
 
   mainWindow.on('close', () => {
