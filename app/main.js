@@ -8,7 +8,8 @@ app.on('ready', () => {
   mainWindow = new BrowserWindow({
     show: false,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      enableRemoteModule: true 
     }
   });
 
@@ -28,7 +29,7 @@ app.on('ready', () => {
 });
 
 // Function that retrieve a text file on user's disk.
-const getFileFromUser = () => {
+const getFileFromUser = exports.getFileFromUser = () => {
   const files = dialog.showOpenDialogSync(mainWindow, {
     properties: ['openFile'],
     filters: [
