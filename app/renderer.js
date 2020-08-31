@@ -1,6 +1,9 @@
 const marked = require('marked');
-const { remote } = require('electron');
+const { remote, ipcRenderer } = require('electron');
 const mainProcess = remote.require('./main.js');
+
+// Reference to the current window.
+const currentWindow = remote.getCurrentWindow();
 
 // Caching DOM selectors.
 const markdownView = document.querySelector('#markdown');
@@ -26,5 +29,16 @@ markdownView.addEventListener('keyup', (event) => {
 
 // Handle file opening.
 openFileButton.addEventListener('click', () => {
-  mainProcess.getFileFromUser();
+  mainProcess.getFileFromUser(currentWindow);
+});
+
+ipcRenderer.on('file-opened', (event, path, file_content) => {
+  markdownView.value = file_content;
+  renderMarkdownToHtml(file_content);
+  console.log("Loaded file located at: ", path);
+});
+
+// Handle new file creation.
+newFileButton.addEventListener('click', () => {
+  mainProcess.createWindow();
 });
