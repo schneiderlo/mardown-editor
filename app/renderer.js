@@ -1,4 +1,5 @@
 const marked = require('marked');
+const path = require('path');
 const { remote, ipcRenderer } = require('electron');
 const mainProcess = remote.require('./main.js');
 
@@ -15,6 +16,24 @@ const revertButton = document.querySelector('#revert');
 const saveHtmlButton = document.querySelector('#save-html');
 const showFileButton = document.querySelector('#show-file');
 const openInDefaultButton = document.querySelector('#open-in-default');
+
+//  Global variables to keep tracks of changes.
+let filePath = null;
+let originalContent = '';
+
+// Function updating the UI.
+const udpdateUserInterface = (isEdited) => {
+  // Change window title.
+  let title = 'Fire Sale';
+  if (filePath) {
+    title = path.basename(filePath) + ' - ' + title;
+  }
+  if (isEdited) {
+    title = '* ' + title;
+  }
+  currentWindow.setTitle(title);
+  currentWindow.setDocumentEdited(isEdited);
+};
 
 // Convert markdown to html.
 const renderMarkdownToHtml = (markdown) => {
@@ -33,9 +52,11 @@ openFileButton.addEventListener('click', () => {
 });
 
 ipcRenderer.on('file-opened', (event, path, file_content) => {
+  filePath = path;
+  originalContent = file_content;
   markdownView.value = file_content;
   renderMarkdownToHtml(file_content);
-  console.log("Loaded file located at: ", path);
+  udpdateUserInterface();
 });
 
 // Handle new file creation.
